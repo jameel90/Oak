@@ -1,0 +1,146 @@
+wget https://opscode-omnibus-packages.s3.amazonaws.com/ubuntu/12.04/x86_64/chefdk_0.5.1-1_amd64.deb
+
+root@ip-172-31-28-91:~#apt update && apt upgrade
+root@ip-172-31-28-91:~#wget https://packages.chef.io/files/stable/chefdk/2.5.3/ubuntu/16.04/chefdk_2.5.3-1_amd64.deb  
+root@ip-172-31-28-91:~#dpkg -i chefdk_*.deb
+root@ip-172-31-28-91:~# chef verify
+
+Neeraj@Neeraj-PC MINGW64 /c/users/Neeraj/Downloads/My_Marriage2014
+$ scp -i DOCER_UCP.pem chef-starter.zip ubuntu@ec2-34-217-176-203.us-west-2.compute.amazonaws.com:~/  --->  (chef-workstation)
+chef-starter.zip                                                                              100% 7815     7.6KB/s   00:00
+
+root@ip-172-31-28-91:~# ls
+chefdk_2.5.3-1_amd64.deb
+root@ip-172-31-28-91:~# cp /home/ubuntu/chef-starter.zip .
+root@ip-172-31-28-91:~# ls
+chefdk_2.5.3-1_amd64.deb  chef-starter.zip
+root@ip-172-31-28-91:~# apt install unzip
+Reading package lists... Done
+Building dependency tree
+Reading state information... Done
+Suggested packages:
+  zip
+The following NEW packages will be installed:
+  unzip
+0 upgraded, 1 newly installed, 0 to remove and 0 not upgraded.
+
+root@ip-172-31-28-91:~# unzip chef-starter.zip
+Archive:  chef-starter.zip
+   creating: chef-repo/cookbooks/
+  inflating: chef-repo/cookbooks/chefignore
+   creating: chef-repo/cookbooks/starter/
+   creating: chef-repo/cookbooks/starter/files/
+   creating: chef-repo/cookbooks/starter/files/default/
+  inflating: chef-repo/cookbooks/starter/files/default/sample.txt
+  inflating: chef-repo/cookbooks/starter/metadata.rb
+   creating: chef-repo/cookbooks/starter/attributes/
+  inflating: chef-repo/cookbooks/starter/attributes/default.rb
+   creating: chef-repo/cookbooks/starter/templates/
+   creating: chef-repo/cookbooks/starter/templates/default/
+  inflating: chef-repo/cookbooks/starter/templates/default/sample.erb
+   creating: chef-repo/cookbooks/starter/recipes/
+  inflating: chef-repo/cookbooks/starter/recipes/default.rb
+  inflating: chef-repo/README.md
+  inflating: chef-repo/.gitignore
+   creating: chef-repo/.chef/
+   creating: chef-repo/roles/
+  inflating: chef-repo/.chef/knife.rb
+  inflating: chef-repo/roles/starter.rb
+  inflating: chef-repo/.chef/svimal.pem
+
+
+root@ip-172-31-28-91:~# ls
+chefdk_2.5.3-1_amd64.deb  chef-repo  chef-starter.zip
+root@ip-172-31-28-91:~# cd chef-repo/
+root@ip-172-31-28-91:~/chef-repo# ls -la
+total 28
+drwxr-xr-x 5 root root 4096 Apr 10 06:56 .
+drwx------ 6 root root 4096 Apr 10 06:56 ..
+drwxr-xr-x 2 root root 4096 Apr 10 06:51 .chef
+drwxr-xr-x 3 root root 4096 Apr 10 06:51 cookbooks
+-rw-r--r-- 1 root root  495 Apr 10 06:51 .gitignore
+-rw-r--r-- 1 root root 2341 Apr 10 06:51 README.md
+drwxr-xr-x 2 root root 4096 Apr 10 06:51 roles
+root@ip-172-31-28-91:~/chef-repo# cd .chef/
+root@ip-172-31-28-91:~/chef-repo/.chef# ls
+knife.rb  svimal.pem
+
+root@ip-172-31-28-91:~/chef-repo/.chef# cat knife.rb
+# See http://docs.chef.io/config_rb_knife.html for more information on knife configuration options
+
+current_dir = File.dirname(__FILE__)
+log_level                :info
+log_location             STDOUT
+node_name                "svimal"
+client_key               "#{current_dir}/svimal.pem"
+chef_server_url          "https://api.chef.io/organizations/svimal"
+cookbook_path            ["#{current_dir}/../cookbooks"]
+
+root@ip-172-31-28-91:~/chef-repo/.chef# knife ssl fetch
+WARNING: Certificates from api.chef.io will be fetched and placed in your trusted_cert
+directory (/root/chef-repo/.chef/trusted_certs).
+
+Knife has no means to verify these are the correct certificates. You should
+verify the authenticity of these certificates after downloading.
+
+Adding certificate for wildcard_opscode_com in /root/chef-repo/.chef/trusted_certs/wildcard_opscode_com.crt
+Adding certificate for DigiCert_SHA2_Secure_Server_CA in /root/chef-repo/.chef/trusted_certs/DigiCert_SHA2_Secure_Server_CA.crt
+
+root@ip-172-31-28-91:~/chef-repo/.chef# knife client list
+svimal-validator
+
+
+root@ip-172-31-28-91:~/chef-repo/.chef# pwd
+/root/chef-repo/.chef
+
+root@ip-172-31-28-91:~/chef-repo/.chef# vi aws_batch.pem
+
+bootstraping
+root@ip-172-31-28-91:~/chef-repo/.chef# 
+knife bootstrap  172.31.30.144 --ssh-user ubuntu  --sudo  --identity-file docker_ucp.pem  --node-name chef-client-1
+
+
+Creating new client for Demo-chef
+Creating new node for Demo-chef
+Connecting to 172.31.31.240
+172.31.31.240 -----> Installing Chef Omnibus (-v 13)
+172.31.31.240 downloading https://omnitruck-direct.chef.io/chef/install.sh
+172.31.31.240   to file /tmp/install.sh.11445/install.sh
+172.31.31.240 trying wget...
+172.31.31.240 ubuntu 16.04 x86_64
+172.31.31.240 Getting information for chef stable 13 for ubuntu...
+172.31.31.240 downloading https://omnitruck-direct.chef.io/stable/chef/metadata?v=13&p=ubuntu&pv=16.04&m=x86_64
+172.31.31.240   to file /tmp/install.sh.11449/metadata.txt
+172.31.31.240 trying wget...
+172.31.31.240 sha1      1ecb70effcf557dbac0d0de528bbef6937f9c581
+172.31.31.240 sha256    ce0ff3baf39c8c13ed474104928e7e4568a4997a1d5797cae2b2ba3ee001e3a8
+172.31.31.240 url       https://packages.chef.io/files/stable/chef/13.8.5/ubuntu/16.04/chef_13.8.5-1_amd64.deb
+172.31.31.240 version   13.8.5
+172.31.31.240 downloaded metadata file looks valid...
+172.31.31.240 downloading https://packages.chef.io/files/stable/chef/13.8.5/ubuntu/16.04/chef_13.8.5-1_amd64.deb
+172.31.31.240   to file /tmp/install.sh.11449/chef_13.8.5-1_amd64.deb
+172.31.31.240 trying wget...
+172.31.31.240 Comparing checksum with sha256sum...
+172.31.31.240 Installing chef 13
+172.31.31.240 installing with dpkg...
+172.31.31.240 Selecting previously unselected package chef.
+(Reading database ... 51142 files and directories currently installed.)
+172.31.31.240 Preparing to unpack .../chef_13.8.5-1_amd64.deb ...
+172.31.31.240 Unpacking chef (13.8.5-1) ...
+172.31.31.240 Setting up chef (13.8.5-1) ...
+172.31.31.240 Thank you for installing Chef!
+172.31.31.240 Starting the first Chef Client run...
+172.31.31.240 Starting Chef Client, version 13.8.5
+172.31.31.240 resolving cookbooks for run list: []
+172.31.31.240 Synchronizing Cookbooks:
+172.31.31.240 Installing Cookbook Gems:
+172.31.31.240 Compiling Cookbooks...
+172.31.31.240 [2018-04-10T07:27:39+00:00] WARN: Node Demo-chef has an empty run list.
+172.31.31.240 Converging 0 resources
+172.31.31.240
+172.31.31.240 Running handlers:
+172.31.31.240 Running handlers complete
+172.31.31.240 Chef Client finished, 0/0 resources updated in 03 seconds
+
+
+
