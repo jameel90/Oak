@@ -1,0 +1,70 @@
+Install Ansible on both host
+===========================
+rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+yum -y install ansible
+amazon-linux-extras install ansible2
+
+
+User to be created on Both Instances
+=========================================
+[root@ip-172-31-28-62 ~]# useradd ansible
+[root@ip-172-31-28-62 ~]# passwd ansible
+Changing password for user ansible.
+New password:
+BAD PASSWORD: The password is shorter than 8 characters
+Retype new password:
+passwd: all authentication tokens updated successfully.
+
+On Both Instances
+===============================
+[root@ip-172-31-29-128 ~]# cat /etc/sudoers | grep ansible
+  ansible       ALL=(ALL)       NOPASSWD: ALL
+
+[root@ip-172-31-29-128 ~]# cat /etc/ssh/sshd_config | grep -i permit
+[root@ip-172-31-29-128 ~]# cat /etc/ssh/sshd_config | grep -i password
+# To disable tunneled clear text passwords, change to no here!
+PasswordAuthentication yes
+#PermitEmptyPasswords no
+PasswordAuthentication no
+# Change to no to disable s/key passwords
+# PasswordAuthentication.  Depending on your PAM configuration,
+# the setting of "PermitRootLogin without-password".
+# PAM authentication, then enable this but set PasswordAuthentication
+
+
+[root@ip-172-31-29-128 ~]# cat /etc/ssh/sshd_config | grep -i permit
+PermitRootLogin yes
+#PermitEmptyPasswords no
+# the setting of "PermitRootLogin without-password".
+#PermitTTY yes
+#PermitUserEnvironment no
+#PermitTunnel no
+#       PermitTTY no
+
+# service sshd restart 
+
+On master
+==========
+[root@ip-172-31-19-89 ec2-user]# ssh-keygen
+[root@ip-172-31-18-31 .ssh]# ssh-copy-id 172.31.26.93
+[root@ip-172-31-18-31 .ssh]# ssh ansible@172.31.26.93
+vi /etc/ansible/hosts
+[hosts]
+Ip_of_client
+
+Modules
+===============
+
+Login on Ansible-Master and execute the below:
+
+create :
+ansible -s hosts -m file -a "dest=/home/ansible/DR_site state=directory mode=755"
+ansible -s hosts -m file -a 'dest=/home/ansible/pom.xml state=touch mode=600 owner=ansible group=ansible'
+
+Delete:
+ansible -s hosts -m file -a "dest=/home/ansible/DR_site state=absent"
+ansible -s hosts -m file -a "dest=/home/ansible/pom.xml state=absent"
+ 
+Package & Service
+ansible -s hosts -m package -a "name=httpd state=latest"
+ansible -s hosts -m service -a "name=httpd state=started"
